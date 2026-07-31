@@ -1,4 +1,4 @@
-# LOTR — One Scanner to Rule Them All
+# LOTR (One Scanner to Rule Them All)
 
 Web application and WordPress security scanner for penetration testers.
 
@@ -50,7 +50,7 @@ python main.py -u https://target.com --mode wordpress --stealth --markdown repor
 main.py               CLI entrypoint
 
 scanner/
-  core.py             Orchestrator — mode-aware
+  core.py             Orchestrator - mode-aware
   recon.py            WP detection + version fingerprint
   waf.py              WAF detection + evasion trigger
   enum.py             User enum, xmlrpc, REST API
@@ -65,7 +65,7 @@ scanner/
   authcheck.py        WP login protection (active)
   injection.py        XSS, SQLi, SSRF, open redirect (active)
   traversal.py        Directory traversal (any web app)
-  idor.py             IDOR — numeric, UUID, param fuzzing (any web app)
+  idor.py             IDOR - numeric, UUID, param fuzzing (any web app)
   fileupload.py       Upload endpoint discovery + bypass (any web app)
   authbypass.py       Auth logic flaws, JWT none, mass assignment (any web app)
 
