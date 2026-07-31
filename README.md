@@ -1,12 +1,12 @@
 # LOTR: One Scanner to Rule Them All
 
 An ODE to Tolkein
-" 
-In the code where shadows lie,
+
+"In the code where shadows lie,
 One scanner watches all,
 Finding the hidden paths,
-Binding each flaw into a chain of insight.
-"
+Binding each flaw into a chain of insight."
+
 A security scanner for web applications and WordPress, built for penetration testers.
 
 Runs a full set of checks against any web app (headers, TLS, IDOR, directory traversal,
