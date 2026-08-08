@@ -1,13 +1,13 @@
-"""
-Plugin detection: passive scan from HTML + WAF-aware active wordlist probing.
-When WAF evasion mode is on, cover requests are interspersed between probes.
-"""
+# Plugin detection: passive scan from HTML + WAF-aware active wordlist probing.
+# When WAF evasion mode is on, cover requests are interspersed between probes.
 
 import re
 import random
 from colorama import Fore, Style
 from utils.http import get
 from utils import wpscan_db, stealth
+
+_rng = random.SystemRandom()
 
 PLUGIN_REF = re.compile(r"wp-content/plugins/([a-zA-Z0-9_\-]+)/[^'\"]*\?ver=([\d.]+)")
 PLUGIN_REF_NOVER = re.compile(r"wp-content/plugins/([a-zA-Z0-9_\-]+)/")
@@ -44,10 +44,10 @@ DEFAULT_WORDLIST = [
     "anti-spam","cleantalk","zero-spam",
     "insert-headers-and-footers","header-footer-code-manager",
     "custom-post-type-ui","pods","toolset-types",
-    "ninja-tables","wp-table-builder","tablepress",
+    "ninja-tables","wp-table-builder",
     "popup-maker","popups-for-divi","mailchimp-for-wp",
-    "wp-mail-smtp","fluent-smtp","postman-smtp",
-    "imagify","ewww-image-optimizer","robin-image-optimizer",
+    "fluent-smtp","postman-smtp",
+    "ewww-image-optimizer","robin-image-optimizer",
     "autoptimize","flying-scripts","asset-cleanup",
     "svg-support","safe-svg","enhanced-media-library",
     "media-library-assistant","real-media-library",
@@ -66,7 +66,6 @@ def detect_from_html(html):
 
 
 def _probe_single(base_url, slug):
-    """Check a single plugin slug — returns version string or None."""
     for path in [
         f"/wp-content/plugins/{slug}/readme.txt",
         f"/wp-content/plugins/{slug}/README.txt",
@@ -80,15 +79,11 @@ def _probe_single(base_url, slug):
 
 
 def probe_wordlist(base_url, wordlist, waf_detected=False):
-    """
-    Active probe with optional WAF evasion.
-    When WAF is detected: shuffle order, intersperse cover requests.
-    """
     found = {}
     slugs = list(wordlist)
 
     if waf_detected:
-        random.shuffle(slugs)
+        _rng.shuffle(slugs)
 
     for i, slug in enumerate(slugs):
         ver = _probe_single(base_url, slug)

@@ -2,12 +2,14 @@
 
 import json
 from colorama import Fore, Style
+from utils.pathsafe import safe_output_path
 
 
 def to_json(results, outfile):
-    with open(outfile, "w", encoding="utf-8") as f:
+    safe_path = safe_output_path(outfile)
+    with open(safe_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, default=str)
-    print(f"{Fore.GREEN}[+] JSON report written to {outfile}{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}[+] JSON report written to {safe_path}{Style.RESET_ALL}")
 
 
 def _collect_findings(results):

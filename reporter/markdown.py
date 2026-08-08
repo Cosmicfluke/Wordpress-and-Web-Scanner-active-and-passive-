@@ -5,6 +5,7 @@
 from datetime import datetime
 from collections import Counter
 from utils.severity import SEVERITY_ORDER
+from utils.pathsafe import safe_output_path
 
 SEVERITY_EMOJI = {
     "Critical": "🔴", "High": "🟠", "Medium": "🟡", "Low": "🔵", "Info": "⚪",
@@ -163,7 +164,8 @@ def generate(results, outfile):
         "*All other severity ratings use a Critical/High/Medium/Low/Info tier system.*",
     ]
 
-    with open(outfile, "w", encoding="utf-8") as fh:
+    safe_path = safe_output_path(outfile)
+    with open(safe_path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines))
 
-    print(f"\033[32m[+] Markdown report written to {outfile}\033[0m")
+    print(f"\033[32m[+] Markdown report written to {safe_path}\033[0m")

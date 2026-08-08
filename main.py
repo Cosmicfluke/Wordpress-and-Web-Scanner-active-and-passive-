@@ -21,6 +21,7 @@ colorama_init(autoreset=True)
 from scanner.core import run_scan
 from reporter import report
 from reporter import markdown as md_report
+from utils.pathsafe import safe_output_path
 
 BANNER = r"""
   _      ___ _____ ___
@@ -28,8 +29,8 @@ BANNER = r"""
  | |__ | (_) || | |   /
  |____| \___/ |_| |_|_\
 
- One scanner to rule them all. One scanner to find them. One scanner to bring the Vulnerabilities and in the darkness bind them.
-
+ One scanner to rule them all.
+ Only use against targets you have written authorisation to test.
 """
 
 
@@ -67,6 +68,31 @@ def parse_args():
     return p.parse_args()
 
 
+def load_plugin_wordlist(raw_path):
+    """
+    Validate and load the plugin wordlist file path supplied via CLI.
+
+    Even though this only runs from the operator's own CLI invocation,
+    the path is normalised and checked for null bytes before being
+    opened, closing off the classic path-injection pattern static
+    analysis flags regardless of trust context.
+    """
+    try:
+        safe_path = safe_output_path(raw_path)
+    except ValueError as e:
+        print(f"[!] Invalid wordlist path: {e}")
+        sys.exit(1)
+
+    try:
+        with open(safe_path) as f:
+            wordlist = [line.strip() for line in f if line.strip()]
+        print(f"[*] Loaded {len(wordlist)} plugin slugs")
+        return wordlist
+    except OSError as e:
+        print(f"[!] Could not read wordlist: {e}")
+        sys.exit(1)
+
+
 def main():
     args = parse_args()
     print(BANNER)
@@ -81,13 +107,7 @@ def main():
 
     wordlist = None
     if args.plugin_wordlist:
-        try:
-            with open(args.plugin_wordlist) as f:
-                wordlist = [line.strip() for line in f if line.strip()]
-            print(f"[*] Loaded {len(wordlist)} plugin slugs")
-        except OSError as e:
-            print(f"[!] Could not read wordlist: {e}")
-            sys.exit(1)
+        wordlist = load_plugin_wordlist(args.plugin_wordlist)
 
     options = {
         "mode"               : args.mode,
@@ -101,9 +121,6 @@ def main():
     results = run_scan(args.url, options=options)
     report.summary(results)
 
-    # NOSONAR - args.json / args.markdown come from the operator's own CLI
-    # invocation on their own machine, not from a remote or untrusted source.
-    # There is no attacker-controlled input reaching these paths.
     if args.json:
         report.to_json(results, args.json)
     if args.markdown:
